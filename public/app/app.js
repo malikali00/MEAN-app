@@ -3,8 +3,9 @@ angular.module('userApp', [
 	'app.routes',
 	'authService',
 	'userService',
+	'chartsService',
 	'mainCtrl',
-	'userCtrl'
+	'chartsCtrl'
 	])
 .config(function($httpProvider)	{	
 	//attach our auth inteceptor to the http requests

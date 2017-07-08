@@ -1,4 +1,4 @@
 module.exports = {
-	'port': process.env.PORT || 8080,
-	secret: "Hello 2016"
+	'port': process.env.PORT || 3000,
+	secret: "Welcome 2017"
 };

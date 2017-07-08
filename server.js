@@ -10,7 +10,6 @@ var mongoose = require('mongoose') //for working with mongoDB
 var config = require('./config'); //get config file
 var path = require('path');
 var jwt = require('jsonwebtoken');
-var User = require(__dirname + '/server//models/user.js');
 
 
 app.use(morgan('dev')); //HTTP logger
@@ -31,7 +30,7 @@ app.use(function(req,res,next){
 });
 
 //==================================--DB--====================================
-mongoose.connect('mongodb://app:myPassword@localhost/appDB');
+mongoose.connect('mongodb://localhost:27017/mydb');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 db.once('open', function (callback) {
@@ -49,7 +48,6 @@ var apiRoutes = require(__dirname + '/server/routes/api')(app,express);
 app.use('/api',apiRoutes); //all /api routes
 
 // MAIN CATCHALL ROUTE-----------------------------------------------------
-// SEND USERS TO FRONTEND -------------------------------------------------
 // has to be registered after API ROUTES
 
 // set up our one route to the index.html file
@@ -58,77 +56,5 @@ app.get('*', function(req, res) {
     res.sendFile(path.join(__dirname + '/public/app/views/index.html'));
 });
 
-//===============================  /authenticate  =========================
-app.post('/authenticate',function(req, res){
-	//find the user
-	//select the name, username and password explicitly
-	User.findOne({
-		username: req.body.username
-	}).select('name username password').exec(function(err,user){
-		if(err) throw err;
-
-		//no user with that username was found
-		if(!user){
-			res.json({
-				success:false,
-				message:'Authencation failed. User not found.'
-			});
-		}else if (user){
-			//check if password matches
-			var validPassword = user.comparePassword(req.body.password);
-			if(!validPassword){
-				res.json({
-					success: false,
-					message: 'Authencation failed. Wrong password.'
-				});
-			}else{
-				//if user is found and password is right
-				//create a token
-				var token = jwt.sign({
-					name: user.name,
-					username: user.username
-				}, superSecret , {
-					expiresIn: 86400 //  (24hrs)
-					// expires in 3600 * 24 = c (24 hours)
-				});
-				//return json object, information including token as JSON
-				res.json({
-					name: user.name,
-					success: true,
-					message: 'Enjoy your token!',
-					token: token
-				});
-			}
-		}
-	});
-});
-
-//=================================  /register  =============================
-app.route('/register')
-	//create a user (accessed at POST http://localhost:8080/api/register)
-	.post(function(req,res) {
-		//create a new instance of the User model
-		var user = new User();
-
-		//set the users information (comes from the request)
-		user.name = req.body.name;
-		user.username = req.body.username;
-		user.password = req.body.password;
-
-		//save the user and check for errors
-		user.save(function(err){
-			if (err){
-				//duplicate entry
-				if(err.code == 11000)
-					return res.json({success: false,
-						message: 'A user with that\ username already exists.'});
-				else
-					return res.send(err);
-			}
-			res.json({ message:'User created!' });
-		});
-	});
-
-//=========================--START THE SERVER---=========================
 app.listen(config.port);
 console.log("Magic happens on port" + config.port);

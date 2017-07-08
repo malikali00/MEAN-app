@@ -16,26 +16,15 @@ angular.module('app.routes', ['ngRoute'])
         	controller   : 'mainController',
         	controllerAs   : 'login'
         })
-
-        //show all users
-        .when('/users',{
-            templateUrl: 'app/views/pages/users/all.html',
-            controller: 'userController',
-            controllerAs: 'user'
+        .when('/charts', {
+            templateUrl: 'app/views/pages/charts/chartjs.html',
+            controller: 'chartController',
+            controllerAs: 'charts'
         })
-
-        //form to create a new user
-        // same view as edit page
-        .when('/users/create',  {
-            templateUrl: 'app/views/pages/users/single.html',
-            controller: 'userCreateController',
-            controllerAs: 'user'
-        })
-        //  page to edit a user
-        .when('/users/:user_id', {
-            templateUrl: 'app/views/pages/users/single.html',
-            controller: 'userEditController',
-            controllerAs: 'user'
+        .when('/morris', {
+            templateUrl: 'app/views/pages/charts/morris.html',
+            controller: 'morrisChartController',
+            controllerAs: 'charts'
         });
     // get rid of the hash in the URL
     $locationProvider.html5Mode(true);
