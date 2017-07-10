@@ -4,19 +4,25 @@ angular.module('chartsCtrl',[])
 
 	$http.get('http://localhost:8080/api/pie-chart').success(function(result){
     	var dataSets = [];
-		angular.forEach(result[2], function(obj){
-			//console.log(obj);
-			if(obj.fillColor){
-				dataSets.push(obj);
-			}
-		});
-		console.log(dataSets);
+    	var labels = [];
+    	angular.forEach(result, function(obj){
+    		if(obj.labels){
+    			labels = obj.labels
+    		}
+    		if(obj.datasets){
+    			angular.forEach(obj.datasets, function(res){
+					if(res.fillColor){
+						dataSets.push(res);
+					}
+				});
+    		}
+    	});	
 		var areaChartCanvas = $('#areaChart').get(0).getContext('2d');
 
 		var areaChart       = new Chart(areaChartCanvas)
 
 	    var areaChartData = {
-	      labels  : result[0].labels,
+	      labels  : labels,
 	      datasets: dataSets
 	    }
 
@@ -120,17 +126,20 @@ angular.module('chartsCtrl',[])
 
     $http.get('http://localhost:8080/api/pie-chart').success(function(result){
     	var piChartData = [];
-    	console.log(result[1]);
-		angular.forEach(result[1], function(obj){
-			if(obj.value){
-				piChartData.push({
-					value    : obj.value,
-			        color    : obj.color,
-			        highlight: obj.highlight,
-			        label    : obj.label
+    	angular.forEach(result, function(obj){
+    		if(obj.charts){
+    			angular.forEach(obj.charts, function(res){
+					if(res.value){
+						piChartData.push({
+							value    : res.value,
+					        color    : res.color,
+					        highlight: res.highlight,
+					        label    : res.label
+						});
+					}	
 				});
-			}	
-		});
+    		}
+    	});
 		var pieChartCanvas = $('#pieChart').get(0).getContext('2d')
 	    var pieChart       = new Chart(pieChartCanvas)
 	    var PieData        = piChartData
